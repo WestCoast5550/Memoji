@@ -152,6 +152,7 @@ function startNewGame() {
     12: { opened: false, emoji: shuffled[11] }
   };
   stack = [];
+  putContent(shuffled);
 }
 
 putContent(shuffled);
