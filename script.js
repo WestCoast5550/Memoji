@@ -13,7 +13,7 @@ const emoji = [
   "🐊"
 ];
 
-const shuffled = shuffle(emoji);
+var shuffled = shuffle(emoji);
 
 var opened = {
   1: { opened: false, emoji: shuffled[0] },
@@ -32,6 +32,12 @@ var opened = {
 
 var stack = [];
 
+var timer = 60;
+
+var interval;
+
+var gameStarted = false;
+
 function shuffle(a) {
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -48,6 +54,12 @@ function putContent(array) {
 }
 
 function myFunction(id) {
+  if (!gameStarted) {
+    interval = setInterval(function() {
+      update(opened);
+    }, 1000);
+    gameStarted = true;
+  }
   toggle(id);
   if (opened[id].opened === true) {
   }
@@ -63,16 +75,18 @@ function myFunction(id) {
   }
   if (stack.length === 1) {
     if (opened[stack[0]].emoji === opened[id].emoji) {
-      document.getElementById(id).childNodes[3].style.background = "green";
+      document.getElementById(id).childNodes[3].style.background = "#5AD66F";
       document.getElementById(stack[0]).childNodes[3].style.background =
-        "green";
+        "#5AD66F";
       stack.pop();
       return;
     }
     if (opened[stack[0]].emoji !== opened[id].emoji) {
       stack.push(id);
-      document.getElementById(stack[1]).childNodes[3].style.background = "red";
-      document.getElementById(stack[0]).childNodes[3].style.background = "red";
+      document.getElementById(stack[1]).childNodes[3].style.background =
+        "#F44336";
+      document.getElementById(stack[0]).childNodes[3].style.background =
+        "#F44336";
       return;
     }
   }
@@ -82,6 +96,62 @@ function myFunction(id) {
 function toggle(id) {
   document.getElementById(id).classList.toggle("rotate");
   opened[id]["opened"] = !opened[id]["opened"];
+}
+
+function update(opened) {
+  var victoryScore = 0;
+  document.getElementById("time").innerHTML =
+    parseInt(document.getElementById("time").innerHTML) - 1;
+  for (let index = 0; index < 12; index++) {
+    if (opened[index + 1].opened) {
+      victoryScore++;
+    }
+  }
+  if (victoryScore === 12) {
+    document.getElementById("modal").style.display = "block";
+    document.getElementById("message").innerHTML =
+      "<span>W</span><span>I</span><span>N</span>";
+    document.getElementById("text").innerHTML = "<span>Try again</span>";
+    clearInterval(interval);
+  }
+  if (parseInt(document.getElementById("time").innerHTML) === 0) {
+    if (victoryScore < 12) {
+      document.getElementById("modal").style.display = "block";
+      document.getElementById("message").innerHTML =
+        "<span>L</span><span>O</span><span>S</span><span>E</span>";
+      document.getElementById("text").innerHTML = "<span>Try again</span>";
+      clearInterval(interval);
+    }
+  }
+}
+
+function startNewGame() {
+  for (i = 0; i < 12; i += 1) {
+    if (opened[i + 1].opened) {
+      toggle(i + 1);
+      document.getElementById(i + 1).childNodes[3].style.background = "white";
+    }
+  }
+
+  document.getElementById("modal").style.display = "none";
+  gameStarted = false;
+  document.getElementById("time").innerHTML = 60;
+  shuffled = shuffle(emoji);
+  opened = {
+    1: { opened: false, emoji: shuffled[0] },
+    2: { opened: false, emoji: shuffled[1] },
+    3: { opened: false, emoji: shuffled[2] },
+    4: { opened: false, emoji: shuffled[3] },
+    5: { opened: false, emoji: shuffled[4] },
+    6: { opened: false, emoji: shuffled[5] },
+    7: { opened: false, emoji: shuffled[6] },
+    8: { opened: false, emoji: shuffled[7] },
+    9: { opened: false, emoji: shuffled[8] },
+    10: { opened: false, emoji: shuffled[9] },
+    11: { opened: false, emoji: shuffled[10] },
+    12: { opened: false, emoji: shuffled[11] }
+  };
+  stack = [];
 }
 
 putContent(shuffled);
